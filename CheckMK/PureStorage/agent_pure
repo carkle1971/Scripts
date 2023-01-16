@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # 2021 created by Bastian Kuhn, bastian-kuhn.de
 # 2021 reworked by Sven Rueß, sritd.de
-# 2022 Added volumes by Carlo Kleinloog
 # /omd/sites/BIS/local/share/check_mk/agents/special
 """
 Pure Checks
@@ -10,11 +9,11 @@ from cgi import print_arguments
 import sys
 import urllib3
 import purestorage
-import purity_fb
 import argparse
 import datetime
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-from purity_fb import PurityFb, ArrayPerformance, rest
+from purity_fb import PurityFb, ArrayPerformance, VersionResponse, rest
+from cmk.gui.i18n import _
 from cmk.gui.plugins.metrics.utils import graph_info, metric_info
 
 def usage():
@@ -130,12 +129,11 @@ def get_drives():
 		print(f"Could not get drives")
 		sys.exit(1)
 
-if __name__ == '__main__':
-	get_alerts()
-	# We need to get Hardware before the drivers, in order
-	# to have more informations for the drives later
-	get_hardware()
-	get_drives()
+def get_array():
+	print("<<<pure_array>>>")
+	array_info = FA.get()
+	print (f"{array_info['array_name']} {array_info['version']} {array_info['revision']} {array_info['id']}")
+
 
 import math
 
@@ -153,17 +151,18 @@ def truncate(number, decimals=0):
 	factor = 10.0 ** decimals
 	return math.trunc(number * factor) / factor
 
-#max = size
-#used = total
-#free = pervolume_free= (int(sizedata) - int(totaldata))
-#total is 	volumes data + snapshot data
-#space=true
-#action=monitor
-#serial = f"{volumes['serial'])}"
-#created = f"{volumes['created'])}"
-#size = f"{volumes['size'])}"
-#total = f"{volumes['total'])}"
-#volumes = f"{volumes['volumes'])}"
+#def bits(bytes) :  
+#    bits = bytes
+#    return bits 
+
+def render_size(value):
+	units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+	unit_index = 0
+
+	while value > 1000 and unit_index < 4:
+		value /= 1024
+		unit_index += 1
+	return "{:.2f} {}".format(value, [unit_index])
 
 def list_volumes():
 	print("<<<df>>>")
@@ -174,35 +173,31 @@ def list_volumes():
 				print(f"{volume['name']} {int(volume['size'])} {int(fs_used)} {int(fs_free)} / {volume['name']}")
 	except OSError:
 		print(f"Could not get volumes")
-		
+
+def list_perfdata():
+	print("<<<volumeperfdata>>>")
+	try:
+		for perfdata in FA.list_volumes(names=["*"], action='monitor'):
+				print(f"{perfdata['name']} reads_per_sec {perfdata['reads_per_sec']} writes_per_sec {perfdata['writes_per_sec']} output_per_sec {perfdata['output_per_sec']} input_per_sec;{perfdata['input_per_sec']} read_latency{perfdata['usec_per_read_op']} write_latency {perfdata['usec_per_write_op']} / {perfdata['name']}")
+	except OSError:		
+		print(f"Could not get perfdata")
+
+def list_details():
+	print("<<<volumedetails>>>")
+	try:
+		for details in FA.list_volumes(names=["*"], space=True):
+			print(f"{details['name']} Data Reduction: {details['data_reduction']} to 1, Total reduction: {details['total_reduction']} to 1, Shared Space: {details['shared_space']}, Thin Provisioned: {details['thin_provisioning']}, Snapshots: {details['snapshots']}, Used after deduplication: {details['volumes']} / {details['name']}")
+	except OSError:
+		print(f"Could not get details")
+
+
 if __name__ == '__main__':
-	# We need to get Hardware before the volumers, in order
-	# to have more informations for the volume later
-	#get_hardware()
-	list_volumes()
-
-#def list_details():
-#	print("<<<df>>>")
-#	try:
-#		for details in FA.list_volumes(names=["*"], space=True):
-#			print(f"{details['name']} Data Reduction: {details['data_reduction']} to 1, Total reduction: {details['total_reduction']} to 1, Shared Space: {details['shared_space']}, Thin Provisioned: {details##  #['thin_provisioning']}, Snapshots: {details['snapshots']}, Used after deduplication: {details['volumes']} / {details['name']}")
-#	except OSError:
-#		print(f"Could not get details")
-
-#if __name__ == '__main__':
-#	# We need to get Hardware before the volumers, in order
-##	#get_hardware()
-#	list_details() 
-
-#def list_perfdata():
-#	print("<<<df>>>")
-#	try:
-#		for perfdata in FA.list_volumes(names=["*"], action='monitor'):
-#				print(f"{perfdata['name']} reads_per_sec {perfdata['reads_per_sec']} writes_per_sec {perfdata['writes_per_sec']} output_per_sec {perfdata['output_per_sec']} input_per_sec;{perfdata#['input_per_sec']} read_latency{perfdata['usec_per_read_op']} write_latency {perfdata['usec_per_write_op']} / {perfdata['name']}")
-##		print(f"Could not get perfdata")
-#
-#if __name__ == '__main__':
-#	# We need to get Hardware before the volumers, in order
-#	# to have more informations for the volume later
-#	#get_hardware()
-#	list_perfdata() 
+	get_alerts()
+	# We need to get Hardware before the drivers, in order
+	# to have more informations for the drives later
+	get_hardware()
+	get_drives()
+	get_array()
+	list_volumes()	
+	list_perfdata()
+	list_details()
