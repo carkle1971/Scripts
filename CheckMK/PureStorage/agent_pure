@@ -164,7 +164,7 @@ def render_size(value):
 		unit_index += 1
 	return "{:.2f} {}".format(value, [unit_index])
 
-def list_volumes():
+def get_volumes():
 	print("<<<df>>>")
 	try:
 		for volume in FA.list_volumes(names=["*"], space=True):
@@ -174,22 +174,28 @@ def list_volumes():
 	except OSError:
 		print(f"Could not get volumes")
 
-def list_perfdata():
-	print("<<<volumeperfdata>>>")
-	try:
-		for perfdata in FA.list_volumes(names=["*"], action='monitor'):
-				print(f"{perfdata['name']} reads_per_sec {perfdata['reads_per_sec']} writes_per_sec {perfdata['writes_per_sec']} output_per_sec {perfdata['output_per_sec']} input_per_sec;{perfdata['input_per_sec']} read_latency{perfdata['usec_per_read_op']} write_latency {perfdata['usec_per_write_op']} / {perfdata['name']}")
-	except OSError:		
-		print(f"Could not get perfdata")
+#wlat = usec_per_write_op
+#rlat = usec_per_read_op
+#wbw = input_per_sec
+#rbw = output_per_sec
+#wiops = writes_per_sec
+#riops = reads_per_sec	
 
-def list_details():
-	print("<<<volumedetails>>>")
+def get_arrayperformance():
+	print("<<<pure_arrayperformance>>>")
+	try:
+		for perfometer in FA.list_volumes(names=["*"], action='monitor'):
+			print(f"{perfometer['name']} {perfometer['reads_per_sec']} {perfometer['writes_per_sec']} {perfometer['output_per_sec']} {perfometer['input_per_sec']} {perfometer['usec_per_read_op']} {perfometer['usec_per_write_op']}")
+	except OSError:
+		print(f"Could not get array volume performance")
+
+def get_arraydetails():
+	print("<<<pure_arraydetails>>>")
 	try:
 		for details in FA.list_volumes(names=["*"], space=True):
-			print(f"{details['name']} Data Reduction: {details['data_reduction']} to 1, Total reduction: {details['total_reduction']} to 1, Shared Space: {details['shared_space']}, Thin Provisioned: {details['thin_provisioning']}, Snapshots: {details['snapshots']}, Used after deduplication: {details['volumes']} / {details['name']}")
+			print(f"{details['name']} {details['data_reduction']} {details['total_reduction']} {details['shared_space']} {details['thin_provisioning']} {details['snapshots']} {details['volumes']}")
 	except OSError:
-		print(f"Could not get details")
-
+		print(f"Could not get array volume details")
 
 if __name__ == '__main__':
 	get_alerts()
@@ -198,6 +204,6 @@ if __name__ == '__main__':
 	get_hardware()
 	get_drives()
 	get_array()
-	list_volumes()	
-	list_perfdata()
-	list_details()
+	get_volumes()
+	get_arrayperformance()
+	get_arraydetails()
