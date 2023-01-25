@@ -33,4 +33,3 @@ rulespec_registry.register(
         valuespec=_valuespec_special_agents_pure,
     )
 )
-
