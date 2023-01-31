@@ -24,27 +24,27 @@ def parse_pure_arraydetails(string_table):
     try:
         data_reduction = (data_reduction)
     except ValueError:
-        data_reduction = 0
+        data_reduction: Literal[0] = 0
     try:
         total_reduction = (total_reduction)
     except ValueError:
-        total_reduction = 0		 
+        total_reduction: Literal[0] = 0	 
     try:
         shared_space = int(shared_space)
     except ValueError:
-        shared_space = 0
+        shared_space: Literal[0] = 0
     try:
         thin_provisioning = (thin_provisioning)
     except ValueError:
-        thin_provisioning = 0
+        thin_provisioning: Literal[0] = 0
     try:
-        snapshots = int(snapshots)
+        snapshots: int = int(snapshots)
     except ValueError:
         snapshots = 0
     try:
             volumes = int(volumes)
     except ValueError:
-            volumes = 0 
+            volumes: Literal[0] = 0 
 
     section[item] = {
             'data_reduction': data_reduction,
