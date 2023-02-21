@@ -1,5 +1,4 @@
-# 2021 created by Sven Rueß, sritd.de
-# 2023 reworked by Carlo Kleinloog
+# 2023 created by Carlo Kleinloog
 #/omd/sites/BIS/local/lib/python3/cmk/base/plugins/agent_based
 
 from .agent_based_api.v1 import (
