@@ -43,7 +43,7 @@ def check_pure_arrayperformance(item, section):
             summary=f"Item {item} not found",
         )
 
-    data = section[item]
+    data=section[item]
     disk_read_ios=data['reads_per_sec']
     disk_write_ios=data['writes_per_sec']
     disk_read_throughput=data['output_per_sec']
