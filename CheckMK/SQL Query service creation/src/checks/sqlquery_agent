@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+#pylint: disable=undefined-variable, missing-docstring
+# 2023 created by Carlo Kleinloog
+#/omd/sites/BIS/local/share/check_mk/checks
+import argparse
+import json
+import sys
+import cmk.utils.password_store
+
+def check_sqlquery_arguments(params, hostname, ipaddress):
+    args = ''
+    args += " " + (params["-H"]) #var1 Host
+    args += " " + (params["-u"]) #var2 Username
+    args += " " + (params["-p"]) #var3 Password
+    args += " " + (params["-n"]) #var4 Database name
+    args += " " + (params['-i']) #var5 Query input
+    #args += " " + quote_shell_string(hostname)
+    #args += " " + quote_shell_string(ipaddress)
+    return args
+special_agent_info['sqlquery'] = check_sqlquery_arguments

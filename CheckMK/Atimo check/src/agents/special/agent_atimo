@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+# 2023 created by Carlo Kleinloog
+# /omd/sites/BIS/local/share/check_mk/agents/special
+# Plugin-File: file which defines the output for the agent
+from os import getenv, name
+import pymssql
+import sys
+from datetime import datetime, timedelta
+from collections import Counter
+import  pymysql as ps
+import argparse
+import re
+import json
+def usage():
+    """
+    Print Usage
+    """
+    print()
+    sys.exit(0)
+
+if len(sys.argv) != 6:
+    usage()
+
+opt_hostname = sys.argv[1]
+opt_user = sys.argv[2]
+opt_password = sys.argv[3]
+opt_name = sys.argv[4]
+opt_input = sys.argv[5]
+db = pymssql
+opt_port=1433
+opt_dbms = "mssql"
+opt_sql           = None
+opt_procedure     = False
+opt_verbose       = False
+opt_debug         = False
+
+def get_atimo():
+    print("<<<atimo>>>")
+    db_connection = db.connect(host=opt_hostname+":"+str(opt_port),user=opt_user, password=opt_password, database=opt_name)
+    cursor = db_connection.cursor()
+    cursor.execute(opt_input)
+    rows=cursor.fetchall()
+    
+    for line in rows:
+        if line[2] is not None:
+            terminal0 = (line[0])
+            location1 = str(line[1])
+            networkaddress2 = (line[2])
+            remaining_jobs3 = (line[3])
+            location01 = location1.replace(" ", "_")
+            terminal, location, networkaddress, remaining_jobs = [terminal0, location01, networkaddress2, remaining_jobs3]
+            print(f"{terminal} {location} {networkaddress} {remaining_jobs}")
+
+    cursor.close()
+#(line[0])=termnr, (line[1])=location, (line[2])=networkaddress, (line[3])=remaining_jobs
+#print=termnr, location, networkaddress, remaining_jobs 
+if __name__ == '__main__':
+    get_atimo()

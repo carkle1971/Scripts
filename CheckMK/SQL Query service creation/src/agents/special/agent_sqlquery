@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+# 2023 created by Carlo Kleinloog
+# /omd/sites/BIS/local/share/check_mk/agents/special
+# Plugin-File: file which defines the output for the agent
+from os import getenv, name
+import pymssql
+import sys
+from datetime import datetime, timedelta
+from collections import Counter
+import  pymysql as ps
+import argparse
+import re
+import json
+def usage():
+    """
+    Print Usage
+    """
+    print()
+    sys.exit(0)
+
+if len(sys.argv) != 6:
+    usage()
+
+opt_hostname = sys.argv[1]
+opt_user = sys.argv[2]
+opt_password = sys.argv[3]
+opt_name = sys.argv[4]
+opt_input = sys.argv[5]
+db = pymssql
+opt_port=1433
+opt_dbms = "mssql"
+opt_sql           = None
+opt_procedure     = False
+opt_verbose       = False
+opt_debug         = False
+
+def get_sqlquery():
+    print("<<<sqlquery>>>")
+    db_connection = db.connect(host=opt_hostname+":"+str(opt_port),user=opt_user, password=opt_password, database=opt_name)
+    cursor = db_connection.cursor()
+    cursor.execute(opt_input)
+    rows=cursor.fetchall()
+
+#You can add more collumn if needed. Just follow the example and make sure you also change /omd/sites/BIS/local/lib/python3/cmk/base/plugins/agent_based/sqlquery.py
+# Make sure column0 is used for the service
+# Make sure column1 is used for the value of the service
+# Collumn 2 and 3 can be extra data for details.
+    for line in rows:
+        if line[2] is not None:
+            collumn0 = (line[0])
+            collumn1 = str(line[1])
+            collumn2 = (line[2])
+            collumn3 = (line[3])
+            collumn00 = collumn0.replace(" ", "_") # When spaces in name they get replaced with underscores
+            collumn01 = collumn1.replace(" ", "_") # When spaces in name they get replaced with underscores
+            collumn02 = collumn2.replace(" ", "_") # When spaces in name they get replaced with underscores
+            collumn03 = collumn3.replace(" ", "_") # When spaces in name they get replaced with underscores
+            collumn000, collumn001, collumn002, collumn003 = [collumn00, collumn01, collumn02, collumn03] #Change this line if needed. You can add more collumn if needed. Just make sure you also change /omd/sites/BIS/local/lib/python3/cmk/base/plugins/agent_based/sqlquery.py
+            print(f"{collumn000} {collumn001} {collumn002} {collumn003}")
+
+    cursor.close()
+
+if __name__ == '__main__':
+    get_sqlquery()
