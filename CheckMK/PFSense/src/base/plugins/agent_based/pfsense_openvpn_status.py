@@ -110,21 +110,21 @@ def check_pfsense_openvpn_status(item, section):
     if item in section.keys():
         yield Result(
             state=State.OK,
-            summary=f"Remote Host: {(remote_host)}, Client ID: {(client_id)}, Peer ID: {(peer_id)}",
+            summary=f"connected since: {connect_time}, Remote Host: {(remote_host)}, Client ID: {(client_id)}, Peer ID: {(peer_id)}",
 
             details = f"virtual_addr {(virtual_addr)}, virtual_addr6: {virtual_addr6} \n \
-            bytes_recv: {(bytes_recv)}, IP Address: {bytes_sent}, Custom Options: {user_name}\n \
-            Certificate: {connect_time}, CA Certificate: {connect_time_unix}, CRL Certificate: {cipher}",
+            Bytes received: {(bytes_recv)}, Bytes sent: {bytes_sent}, Username: {user_name}\n \
+            , Unix Time: {connect_time_unix}, Cipher used: {cipher}",
             )
 
     else:
         yield Result(
             state=State.CRIT,
-            summary=f"Remote Host: {(remote_host)}, Client ID: {(client_id)}, Peer ID: {(peer_id)}",
+            summary=f"connected since: {connect_time}, Remote Host: {(remote_host)}, Client ID: {(client_id)}, Peer ID: {(peer_id)}",
 
             details = f"virtual_addr {(virtual_addr)}, virtual_addr6: {virtual_addr6} \n \
-            bytes_recv: {(bytes_recv)}, IP Address: {bytes_sent}, Custom Options: {user_name}\n \
-            Certificate: {connect_time}, CA Certificate: {connect_time_unix}, CRL Certificate: {cipher}",
+            Bytes received: {(bytes_recv)}, Bytes sent: {bytes_sent}, Username: {user_name}\n \
+            , Unix Time: {connect_time_unix}, Cipher used: {cipher}",
             )
 
 
