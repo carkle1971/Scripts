@@ -116,7 +116,11 @@ def check_pfsense_openvpn_status(item, section):
             Bytes received: {(bytes_recv)}, Bytes sent: {bytes_sent}, Username: {user_name}\n \
             , Unix Time: {connect_time_unix}, Cipher used: {cipher}",
             )
-
+# Metrics
+        yield Metric("pfsense_connect_time", float(data['connect_time']))
+        yield Metric("pfsense_connect_time_unix", float(data['connect_time_unix']))
+        yield Metric("pfsense_bytes_recv", int(bytes_recv))
+        yield Metric("pfsense_bytes_sent", int(bytes_sent))
     else:
         yield Result(
             state=State.CRIT,
@@ -126,7 +130,11 @@ def check_pfsense_openvpn_status(item, section):
             Bytes received: {(bytes_recv)}, Bytes sent: {bytes_sent}, Username: {user_name}\n \
             , Unix Time: {connect_time_unix}, Cipher used: {cipher}",
             )
-
+# Metrics
+        yield Metric("pfsense_connect_time", float(data['connect_time']))
+        yield Metric("pfsense_connect_time_unix", float(data['connect_time_unix']))
+        yield Metric("pfsense_bytes_recv", int(bytes_recv))
+        yield Metric("pfsense_bytes_sent", int(bytes_sent))
 
 register.check_plugin(
     name="pfsense_openvpn_status",

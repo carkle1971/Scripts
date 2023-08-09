@@ -60,179 +60,36 @@ from cmk.gui.plugins.metrics import (
 # "color" : "23/b" (nuance of color yellow)
 #
 
-metric_info["mbuf_usage"] = {
-    "title": _("mbuf_usage"),
+metric_info["connect_time"] = {
+    "title": _("connect_time"),
     "unit": "a",
     "color": "144/a",
 }
-metric_info["mem_usage"] = {
-    "title": _("mem_usage"),
+metric_info["connect_time_unix"] = {
+    "title": _("connect_time_unix"),
     "unit": "v",
     "color": "23/a",
 }
-metric_info["swap_usage"] = {
-    "title": _("swap_usage"),
+metric_info["bytes_recv"] = {
+    "title": _("bytes_recv"),
     "unit": "w",
     "color": "33/a",
 }
 
-metric_info["disk_usage"] = {
-    "title": _("disk_usage"),
-    "unit": "w",
-    "color": "33/a",
-}
-
-metric_info["delay"] = {
-    "title": _("delay"),
-    "unit": "a",
-    "color": "144/a",
-}
-metric_info["stddev"] = {
-    "title": _("stddev"),
-    "unit": "v",
-    "color": "23/a",
-}
-metric_info["loss"] = {
-    "title": _("loss"),
+metric_info["bytes_sent"] = {
+    "title": _("bytes_sent"),
     "unit": "w",
     "color": "33/a",
 }
 
 
-metric_info["inerrs"] = {
-    "title": _("inerrs"),
-    "unit": "%",
-    "color": "16/a",
-}
-
-metric_info["outerrs"] = {
-    "title": _("outerrs"),
-    "unit": "a",
-    "color": "12/a",
-}
-metric_info["collisions"] = {
-    "title": _("collisions"),
-    "unit": "v",
-    "color": "13/a",
-}
-metric_info["inbytespass"] = {
-    "title": _("inbytespass"),
-    "unit": "w",
-    "color": "16/a",
-}
-
-metric_info["outbytespass"] = {
-    "title": _("outbytespass"),
-    "unit": "",
-    "color": "12/b",
-}
-metric_info["inpktspass"] = {
-    "title": _("inpktspass"),
-    "unit": "",
-    "color": "16/a",
-}
-metric_info["outpktspass"] = {
-    "title": _("outpktspass"),
-    "unit": "%",
-    "color": "12/a",
-}
-
-metric_info["inbytesblock"] = {
-    "title": _("inbytesblock"),
-    "unit": "a",
-    "color": "16/a",
-}
-metric_info["outbytesblock"] = {
-    "title": _("outbytesblock"),
-    "unit": "v",
-    "color": "12/a",
-}
-metric_info["inpktsblock"] = {
-    "title": _("inpktsblock"),
-    "unit": "w",
-    "color": "16/a",
-}
-
-metric_info["outpktsblock"] = {
-    "title": _("outpktsblock"),
-    "unit": "",
-    "color": "12/a",
-}
-metric_info["inbytes"] = {
-    "title": _("inbytes"),
-    "unit": "%",
-    "color": "16/a",
-}
-
-metric_info["outbytes"] = {
-    "title": _("outbytes"),
-    "unit": "a",
-    "color": "12/a",
-}
-metric_info["inpkts"] = {
-    "title": _("inpkts"),
-    "unit": "v",
-    "color": "16/a",
-}
-metric_info["outpkts"] = {
-    "title": _("outpkts"),
-    "unit": "w",
-    "color": "11/a",
-}
 
 
-graph_info["inners_outers_combined"] = {
-    "title" : _("inners_outers_combined"),
+
+graph_info["bytes_sent_receive"] = {
+    "title" : _("bytes_sent_receive"),
     "metrics" : [
-        ("inerrs","area"),
-        ("outerrs","stack"),
-    ],
-}
-
-graph_info["inbytespass_outbytespass_combined"] = {
-    "title" : _("inbytespass_outbytespass_combined"),
-    "metrics" : [
-        ("inbytespass","area"),
-        ("outbytespass","stack"),
-    ],
-}
-
-graph_info["inpktspass_outpktspass_sta_combined"] = {
-    "title" : _("inpktspass_outpktspass_sta_combined"),
-    "metrics" : [
-        ("inpktspass","area"),
-        ("outpktspass","stack"),
-    ],
-}
-
-graph_info["inbytesblock_outbytesblock_combined"] = {
-    "title" : _("inbytesblock_outbytesblock_combined"),
-    "metrics" : [
-        ("inbytesblock","area"),
-        ("outbytesblock","stack"),
-    ],
-}
-
-graph_info["inpktsblock_outpktsblock_combined"] = {
-    "title" : _("inpktsblock_outpktsblock_combined"),
-    "metrics" : [
-        ("inpktsblock","area"),
-        ("outpktsblock","stack"),
-    ],
-}
-
-graph_info["inbytes_outbytes_combined"] = {
-    "title" : _("inbytes_outbytes_combined"),
-    "metrics" : [
-        ("inbytes","area"),
-        ("outbytes","stack"),
-    ],
-}
-
-graph_info["inpkts_outpkts_combined"] = {
-    "title" : _("inpkts_outpkts_combined"),
-    "metrics" : [
-        ("inpkts","area"),
-        ("outpkts","stack"),
+        ("bytes_recv","area"),
+        ("bytes_sent","stack"),
     ],
 }
