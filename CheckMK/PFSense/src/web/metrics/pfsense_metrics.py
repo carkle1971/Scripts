@@ -60,16 +60,6 @@ from cmk.gui.plugins.metrics import (
 # "color" : "23/b" (nuance of color yellow)
 #
 
-metric_info["connect_time"] = {
-    "title": _("connect_time"),
-    "unit": "a",
-    "color": "144/a",
-}
-metric_info["connect_time_unix"] = {
-    "title": _("connect_time_unix"),
-    "unit": "v",
-    "color": "23/a",
-}
 metric_info["bytes_recv"] = {
     "title": _("bytes_recv"),
     "unit": "w",
