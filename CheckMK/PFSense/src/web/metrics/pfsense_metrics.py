@@ -60,14 +60,14 @@ from cmk.gui.plugins.metrics import (
 # "color" : "23/b" (nuance of color yellow)
 #
 
-metric_info["bytes_recv"] = {
-    "title": _("bytes_recv"),
+metric_info["pfsense_bytes_recv"] = {
+    "title": _("pfsense_bytes_recv"),
     "unit": "w",
     "color": "33/a",
 }
 
-metric_info["bytes_sent"] = {
-    "title": _("bytes_sent"),
+metric_info["pfsense_bytes_sent"] = {
+    "title": _("pfsense_bytes_sent"),
     "unit": "w",
     "color": "33/a",
 }
@@ -79,7 +79,7 @@ metric_info["bytes_sent"] = {
 graph_info["bytes_sent_receive"] = {
     "title" : _("bytes_sent_receive"),
     "metrics" : [
-        ("bytes_recv","area"),
-        ("bytes_sent","stack"),
+        ("pfsense_bytes_recv","area"),
+        ("pfsense_bytes_sent","stack"),
     ],
 }
