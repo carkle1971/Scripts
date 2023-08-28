@@ -62,13 +62,13 @@ from cmk.gui.plugins.metrics import (
 
 metric_info["pfsense_bytes_recv"] = {
     "title": _("pfsense_bytes_recv"),
-    "unit": "w",
+    "unit": "bytes",
     "color": "33/a",
 }
 
 metric_info["pfsense_bytes_sent"] = {
     "title": _("pfsense_bytes_sent"),
-    "unit": "w",
+    "unit": "bytes",
     "color": "33/a",
 }
 
