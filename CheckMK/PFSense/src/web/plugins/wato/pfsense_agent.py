@@ -13,10 +13,13 @@ from cmk.gui.valuespec import (
     TextAscii,
     TextInput,
     TextAreaUnicode,
+    NetworkPort,
 )
 from cmk.gui.plugins.wato import (
-    rulespec_registry,
     HostRulespec,
+    CheckParameterRulespecWithItem,
+    IndividualOrStoredPassword,
+    rulespec_registry,
 )
 from cmk.gui.plugins.wato.datasource_programs import (
     RulespecGroupDatasourceProgramsHardware,
@@ -29,7 +32,8 @@ def _valuespec_special_agents_pfsense():
         help = _("This rule set selects the special agent for pfsense"),
         elements = [
             ("-H", TextAscii(title = _("Appliance IP"), allow_empty = False, help = _("Type or paste the PFSense Appliance IP here."))),
-            ("-u", TextAscii(title = _("UserName"), allow_empty = False, help = _("Type or paste the username here."))),
+            ("port", NetworkPort(title = _("Port"),default_value = 4443, minvalue = 1, maxvalue = 65535,help = _("Type or paste appliance port here."))),
+            ("-u", TextAscii(title = _("Username"), allow_empty = False, help = _("Type or paste the username here."))),
             ("-p", Password(title = _("Password"), allow_empty = False, help = _("Type or paste the user password here."))),
         ],
         optional_keys=[],

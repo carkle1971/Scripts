@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
 # 2023 created by Carlo Kleinloog
 # /omd/sites/BIS/local/share/check_mk/agents/special
 # Working CURL: curl -X 'GET' --insecure 'https://10.31.254.253:4443/api/v1/status/openvpn' -H 'accept: application/json' -H 'Authorization: Basic YXBpOm9JSlc0dldyeDdpTjVCdllJMzd2'
@@ -10,18 +11,21 @@ import json
 import requests
 from urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+import argparse
 
 hostname = sys.argv[1]
-username = sys.argv[2]
-password = sys.argv[3]
+port = sys.argv[2]
+username = sys.argv[3]
+password = sys.argv[4]
+
 
 def get_pfsense_interface():
     print()
 try:
-    jsonStr_interface = requests.get(('https://' + hostname + ':4443/api/v1/status/interface'), verify=False, auth=(username, password)).text
-    int_print = (json.loads(jsonStr_interface.replace('if','vnic'))['data'])
+    jsonStr_interface = requests.get(('https://' + hostname+":"+str(port) +'/api/v1/status/interface'), verify=False, auth=(username, password)).text
+    response_interface = (json.loads(jsonStr_interface.replace('if','vnic'))['data'])
     print("<<<pfsense_interface>>>")
-    for interface_data in int_print:
+    for interface_data in response_interface:
             if interface_data['status'] == 'up':
                 name = interface_data['name']
                 hwvnic:str = interface_data['hwvnic']
@@ -55,10 +59,10 @@ except OSError:
 def get_pfsense_gateway():
     print()
 try:
-    jsonStr_gateway = requests.get(('https://' + hostname + ':4443/api/v1/status/gateway'), verify=False, auth=(username, password)).text
-    gateway_print = (json.loads(jsonStr_gateway)['data'])
+    jsonStr_gateway = requests.get(('https://' + hostname+":"+str(port) + '/api/v1/status/gateway'), verify=False, auth=(username, password)).text
+    response_gateway = (json.loads(jsonStr_gateway)['data'])
     print("<<<pfsense_gateway>>>")
-    for gateway_data in gateway_print:
+    for gateway_data in response_gateway:
             if gateway_data['status'] == 'online':
                 name:str = gateway_data['name']
                 monitorip:str = gateway_data['monitorip']
@@ -75,20 +79,20 @@ except OSError:
 def get_pfsense_system():
     print()
 try:
-    jsonStr_system = requests.get(('https://' + hostname + ':4443/api/v1/status/system'), verify=False, auth=(username, password)).text
-    system_print = (json.loads(jsonStr_system.replace(' ','_'))['data'])
+    jsonStr_system = requests.get(('https://' + hostname+":"+str(port) + '/api/v1/status/system'), verify=False, auth=(username, password)).text
+    response_system = (json.loads(jsonStr_system.replace(' ','_'))['data'])
     print("<<<pfsense_system>>>")
-    system_platform:str  = system_print['system_platform']
-    system_netgate_id:str  = system_print['system_netgate_id']
-    bios_vendor = system_print['bios_vendor']
-    bios_version:int  = system_print['bios_version']
-    cpu_model:str = system_print['cpu_model']
-    kernel_pti:str = system_print['kernel_pti']
-    cpu_count:int = system_print['cpu_count']
-    mbuf_usage:int = system_print['mbuf_usage']
-    mem_usage:int = system_print['mem_usage']
-    swap_usage:int = system_print['swap_usage']
-    disk_usage:int = system_print['disk_usage']
+    system_platform:str  = response_system['system_platform']
+    system_netgate_id:str  = response_system['system_netgate_id']
+    bios_vendor = response_system['bios_vendor']
+    bios_version:int  = response_system['bios_version']
+    cpu_model:str = response_system['cpu_model']
+    kernel_pti:str = response_system['kernel_pti']
+    cpu_count:int = response_system['cpu_count']
+    mbuf_usage:int = response_system['mbuf_usage']
+    mem_usage:int = response_system['mem_usage']
+    swap_usage:int = response_system['swap_usage']
+    disk_usage:int = response_system['disk_usage']
     print(f"{system_netgate_id} {system_platform} {bios_vendor} {bios_version} {cpu_model} {kernel_pti} {cpu_count} {mbuf_usage} {mem_usage} {swap_usage} {disk_usage} {swap_usage}")
 except OSError:
     print(f"Connection error to host {hostname}")
@@ -103,10 +107,10 @@ def convert_to_str(value):
 def get_pfsense_server():
     print()
 try:
-    jsonStr_server = requests.get(('https://' + hostname + ':4443/api/v1/services/openvpn/server'), verify=False, auth=(username, password)).text
-    server_print = (json.loads(jsonStr_server.replace(' ', '_'))['data'])
+    jsonStr_server = requests.get(('https://' + hostname+":"+str(port) + '/api/v1/services/openvpn/server'), verify=False, auth=(username, password)).text
+    response_server = (json.loads(jsonStr_server.replace(' ', '_'))['data'])
     print("<<<pfsense_server>>>")
-    for server_data in server_print:
+    for server_data in response_server:
             server = 'on'
             if server == 'on':
                 vpnid = server_data['vpnid']
@@ -117,18 +121,13 @@ try:
                 ipaddr = server_data['ipaddr']
                 local_port  = server_data['local_port']
                 description = server_data['description']
-                custom_options = server_data['custom_options']
                 caref = server_data['caref']
                 crlref = server_data['crlref']
-                ocspurl = server_data['ocspurl']
                 certref = server_data['certref']
                 dh_length = server_data['dh_length']
                 ecdh_curve = server_data['ecdh_curve']
                 cert_depth = server_data['cert_depth']
-                remote_cert_tls = server_data['remote_cert_tls']
                 data_ciphers_fallback = server_data['data_ciphers_fallback']
-                digest = server_data['digest']
-                engine = server_data['engine']
                 tunnel_network = server_data['tunnel_network']
                 tunnel_networkv6 = server_data['tunnel_networkv6']
                 remote_network = server_data['remote_network']
@@ -137,11 +136,6 @@ try:
                 gwredir6 = server_data['gwredir6']
                 local_network = server_data['local_network']
                 local_networkv6 = server_data['local_networkv6']
-                maxclients = server_data['maxclients']
-                allow_compression = server_data['allow_compression']
-                compression = server_data['compression']
-                compression_push = server_data['compression_push']
-                passtos = server_data['passtos']
                 client2client = server_data['client2client']
                 dynamic_ip = server_data['dynamic_ip']
                 topology = server_data['topology']
@@ -152,23 +146,10 @@ try:
                 serverbridge_dhcp_end = server_data['serverbridge_dhcp_end']
                 username_as_common_name = server_data['username_as_common_name']
                 sndrcvbuf = server_data['sndrcvbuf']
-                netbios_enable = server_data['netbios_enable']
-                netbios_ntype= server_data['netbios_ntype']
-                netbios_scope = server_data['netbios_scope']
                 create_gw = server_data['create_gw']
-                verbosity_level  = server_data['verbosity_level']
                 data_ciphers = server_data['data_ciphers']
-                ncp_enable = server_data['ncp_enable']
-                ping_method = server_data['ping_method']
-                keepalive_interval  = server_data['keepalive_interval']
-                keepalive_timeout  = server_data['keepalive_timeout']
-                ping_seconds = server_data['ping_seconds']
-                ping_push = server_data['ping_push']
-                ping_action = server_data['ping_action']
-                ping_action_seconds  = server_data['ping_action_seconds']
-                ping_action_push  = server_data['ping_action_push']
                 inactive_seconds  = server_data['inactive_seconds']
-                print(f"{convert_to_str(description)} {convert_to_str(vpnid)} {convert_to_str(mode)} {convert_to_str(protocol)} {convert_to_str(dev_mode)} {convert_to_str(interface)} {convert_to_str(ipaddr)} {convert_to_str(local_port)} {convert_to_str(description)} {convert_to_str(custom_options)} {convert_to_str(caref)} {convert_to_str(crlref)} {convert_to_str(certref)} {convert_to_str(dh_length)} {convert_to_str(ecdh_curve)} {convert_to_str(cert_depth)} {convert_to_str(remote_cert_tls)} {convert_to_str(data_ciphers_fallback)} {convert_to_str(digest)} {convert_to_str(engine)} {convert_to_str(tunnel_network)} {convert_to_str(tunnel_networkv6)} {convert_to_str(remote_network)} {convert_to_str(remote_networkv6)} {convert_to_str(gwredir)} {convert_to_str(gwredir6)} {convert_to_str(local_network)} {convert_to_str(local_networkv6)} {convert_to_str(maxclients)} {convert_to_str(allow_compression)} {convert_to_str(compression)} {convert_to_str(compression_push)} {convert_to_str(passtos)} {convert_to_str(client2client)} {convert_to_str(dynamic_ip)} {convert_to_str(topology)} {convert_to_str(serverbridge_dhcp)} {convert_to_str(serverbridge_interface)} {convert_to_str(serverbridge_routegateway)} {convert_to_str(serverbridge_dhcp_start)} {convert_to_str(serverbridge_dhcp_end)} {convert_to_str(username_as_common_name)} {convert_to_str(sndrcvbuf)} {convert_to_str(netbios_enable)} {convert_to_str(netbios_ntype)} {convert_to_str(netbios_scope)} {convert_to_str(create_gw)} {convert_to_str(verbosity_level)} {convert_to_str(data_ciphers)} {convert_to_str(ncp_enable)} {convert_to_str(ping_method)} {convert_to_str(keepalive_interval)} {convert_to_str(keepalive_timeout)} {convert_to_str(ping_seconds)} {convert_to_str(ping_push)} {convert_to_str(ping_action)} {convert_to_str(ping_action_seconds)} {convert_to_str(ping_action_push)} {convert_to_str(inactive_seconds)}")
+                print(f"{convert_to_str(description)} {convert_to_str(vpnid)} {convert_to_str(mode)} {convert_to_str(protocol)} {convert_to_str(dev_mode)} {convert_to_str(interface)} {convert_to_str(ipaddr)} {convert_to_str(local_port)} {convert_to_str(caref)} {convert_to_str(crlref)} {convert_to_str(certref)} {convert_to_str(dh_length)} {convert_to_str(ecdh_curve)} {convert_to_str(cert_depth)}  {convert_to_str(data_ciphers_fallback)} {convert_to_str(tunnel_network)} {convert_to_str(tunnel_networkv6)} {convert_to_str(remote_network)} {convert_to_str(remote_networkv6)} {convert_to_str(gwredir)} {convert_to_str(gwredir6)} {convert_to_str(local_network)} {convert_to_str(local_networkv6)} {convert_to_str(client2client)} {convert_to_str(dynamic_ip)} {convert_to_str(topology)} {convert_to_str(serverbridge_dhcp)} {convert_to_str(serverbridge_interface)} {convert_to_str(serverbridge_routegateway)} {convert_to_str(serverbridge_dhcp_start)} {convert_to_str(serverbridge_dhcp_end)} {convert_to_str(username_as_common_name)} {convert_to_str(sndrcvbuf)} {convert_to_str(create_gw)} {convert_to_str(data_ciphers)} {convert_to_str(inactive_seconds)}")
 except OSError:
     print(f"Connection error to host {hostname}")
     sys.exit(1)
@@ -182,32 +163,33 @@ def get_pfsense_openvpn_status():
     print()
 payload  = {"conns": 'common_name'}
 try:
-    response_status  = requests.get(('https://' + hostname + ':4443/api/v1/status/openvpn'), verify=False, auth=(username, password))
-    response_json = response_status.json()
+    jsonStr_status  = requests.get(('https://' + hostname+":"+str(port) + '/api/v1/status/openvpn'), verify=False, auth=(username, password))
+    response_status = jsonStr_status.json()
     print("<<<pfsense_openvpn_status>>>")
-    for vpnstatus in response_json['data']['servers']:
+    for vpnstatus in response_status['data']['servers']:
         for elem in vpnstatus['conns']:
-            common_name = elem['common_name']
-            common_name_no_space = common_name.replace(" ", "_")
-            remote_host = elem['remote_host']
-            virtual_addr = elem['virtual_addr']
-            virtual_addr6 = elem['virtual_addr6']
-            virtual_addr6_no_space = virtual_addr6.replace("", "No")
-            bytes_recv = elem['bytes_recv']
-            bytes_sent = elem['bytes_sent']
-            connect_time = elem['connect_time']
-            connect_time_no_space = connect_time.replace(" ", "_")
-            connect_time_unix = elem['connect_time_unix']
-            user_name = elem['user_name']
-            user_name_undef = user_name.replace("UNDEF", "No")
-            client_id = elem['client_id']
-            peer_id = elem['peer_id']
-            cipher = elem['cipher']
-            print(f"{remove_empty_lines(common_name_no_space)} {remove_empty_lines(remote_host)} {remove_empty_lines(virtual_addr)} {remove_empty_lines(virtual_addr6_no_space)} {remove_empty_lines(bytes_recv)} {remove_empty_lines(bytes_sent)} {remove_empty_lines(connect_time_no_space)} {remove_empty_lines(connect_time_unix)} {remove_empty_lines(user_name_undef)} {remove_empty_lines(client_id)} {remove_empty_lines(peer_id)} {remove_empty_lines(cipher)}")
+            connect_time_ifstate = elem['connect_time_unix']
+            if not connect_time_ifstate == "":
+                common_name = elem['common_name']
+                common_name_no_space = common_name.replace(" ", "_")
+                remote_host = elem['remote_host']
+                virtual_addr = elem['virtual_addr']
+                virtual_addr6 = elem['virtual_addr6']
+                virtual_addr6_no_space = virtual_addr6.replace("", "No")
+                bytes_recv = elem['bytes_recv']
+                bytes_sent = elem['bytes_sent']
+                connect_time = elem['connect_time']
+                connect_time_no_space = connect_time.replace(" ", "_")
+                connect_time_unix = elem['connect_time_unix']
+                user_name = elem['user_name']
+                user_name_undef = user_name.replace("UNDEF", "No")
+                client_id = elem['client_id']
+                peer_id = elem['peer_id']
+                cipher = elem['cipher']
+                print(f"{remove_empty_lines(common_name_no_space)} {remove_empty_lines(remote_host)} {remove_empty_lines(virtual_addr)} {remove_empty_lines(virtual_addr6_no_space)} {remove_empty_lines(bytes_recv)} {remove_empty_lines(bytes_sent)} {remove_empty_lines(connect_time_no_space)} {remove_empty_lines(connect_time_unix)} {remove_empty_lines(user_name_undef)} {remove_empty_lines(client_id)} {remove_empty_lines(peer_id)} {remove_empty_lines(cipher)}")
 except OSError:
     print(f"Connection error to host {hostname}")
     sys.exit(1)
-
 
 if __name__ == '__main__':
     get_pfsense_interface()
@@ -215,4 +197,3 @@ if __name__ == '__main__':
     get_pfsense_system()
     get_pfsense_server()
     get_pfsense_openvpn_status()
-    #get_pfsense_openvpn_routes()

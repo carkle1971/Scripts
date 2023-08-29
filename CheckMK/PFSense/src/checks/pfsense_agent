@@ -11,8 +11,9 @@ import cmk.utils.password_store
 def check_pfsense_arguments(params, hostname, ipaddress):
     args = ''
     args += " " + (params["-H"]) #var1
-    args += " " + (params["-u"]) #var2
-    args += " " + (params["-p"]) #var3
+    args += " " + str(params["port"])#var2
+    args += " " + (params["-u"]) #var3
+    args += " " + (params["-p"]) #var4
     #args += " " + quote_shell_string(hostname)
     #args += " " + quote_shell_string(ipaddress)
     return args

@@ -110,11 +110,11 @@ def check_pfsense_openvpn_status(item, section):
     if item in section.keys():
         yield Result(
             state=State.OK,
-            summary=f"connected since: {connect_time}, Remote Host: {(remote_host)}, Client ID: {(client_id)}, Peer ID: {(peer_id)}",
+            summary=f"Connected since: {connect_time}, Remote Host: {(remote_host)}, Client ID: {(client_id)}, Peer ID: {(peer_id)}",
 
             details = f"virtual_addr {(virtual_addr)}, virtual_addr6: {virtual_addr6} \n \
             Bytes received: {(bytes_recv)}, Bytes sent: {bytes_sent}, Username: {user_name}\n \
-            , Unix Time: {connect_time_unix}, Cipher used: {cipher}",
+            Unix Time: {connect_time_unix}, Cipher used: {cipher}",
             )
 # Metrics
         yield Metric("pfsense_bytes_recv", int(bytes_recv))
@@ -122,11 +122,11 @@ def check_pfsense_openvpn_status(item, section):
     else:
         yield Result(
             state=State.CRIT,
-            summary=f"connected since: {connect_time}, Remote Host: {(remote_host)}, Client ID: {(client_id)}, Peer ID: {(peer_id)}",
+            summary=f"Connected since: {connect_time}, Remote Host: {(remote_host)}, Client ID: {(client_id)}, Peer ID: {(peer_id)}",
 
             details = f"virtual_addr {(virtual_addr)}, virtual_addr6: {virtual_addr6} \n \
             Bytes received: {(bytes_recv)}, Bytes sent: {bytes_sent}, Username: {user_name}\n \
-            , Unix Time: {connect_time_unix}, Cipher used: {cipher}",
+            Unix Time: {connect_time_unix}, Cipher used: {cipher}",
             )
 # Metrics
         yield Metric("pfsense_bytes_recv", int(bytes_recv))
@@ -134,7 +134,7 @@ def check_pfsense_openvpn_status(item, section):
 
 register.check_plugin(
     name="pfsense_openvpn_status",
-    service_name="OpenVPN Status %s",
+    service_name="Status %s",
     discovery_function=discovery_pfsense_openvpn_status,
     check_function=check_pfsense_openvpn_status,
 )
