@@ -17,11 +17,15 @@ port = "8888"
 nodes = "nodes.json"
 oxidized_url = f"{protocol}://{hostname}:{port}/{nodes}"
 
+
+#time_parsed = datetime.strptime(time, "%Y-%m-%d %H:%M:%S %Z")
+#if datetime.now() - time_parsed >= THRESHOLD:
+
 def get_oxidized_status():
     print()
 try:
     jsonStr_status  = requests.get(oxidized_url).text
-    oxidized_status = (json.loads(jsonStr_status.replace(' ',':')))
+    oxidized_status = (json.loads(jsonStr_status.replace('None','NoData')))
     print("<<<oxidized_status>>>")
     for backupstatus in oxidized_status:
         name:str  = backupstatus['name']
@@ -30,8 +34,10 @@ try:
         model:str = backupstatus['model']
         mtime:str = backupstatus['mtime']
         status:str = backupstatus['status']
-        time:str = backupstatus['time']
-        print(f"{name} {status} {time} {ip} {group} {model}")
+        time = datetime.strptime(backupstatus['time'], "%Y-%m-%d %H:%M:%S %Z")
+        start = datetime.strptime(backupstatus['last']['start'], "%Y-%m-%d %H:%M:%S %Z")
+        end = datetime.strptime(backupstatus['last']['end'], "%Y-%m-%d %H:%M:%S %Z")
+        print(f"{name} {status} {time} {ip} {group} {model} {start} {end}")
 except OSError:
     print(f"Connection error to host {hostname}")
     sys.exit(1)
