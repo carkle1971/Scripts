@@ -17,20 +17,12 @@ THRESHOLD = timedelta(days=1)
 def parse_oxidized_status(string_table):
     section = {}
     for row in string_table:
-        (item, status, backup_date, backup_time, ip_address, group, model, start_date, start_time, end_date, end_time)  = row
+        (item, last_status, ip_address, group, model, backup_time, last_start_date, last_start_time, last_end_date, last_end_time)  = row
 
         try:
-            status:str=status
+            last_status:str=last_status
         except ValueError:
-            status=0
-        try:
-            backup_date:str=backup_date
-        except ValueError:
-            backup_date=0
-        try:
-            backup_time:str=backup_time
-        except ValueError:
-            backup_time=0
+            last_status=0
         try:
             ip_address:str=ip_address
         except ValueError:
@@ -44,33 +36,36 @@ def parse_oxidized_status(string_table):
         except ValueError:
             model=0
         try:
-            start_date:str=start_date
+            backup_time:str=backup_time
         except ValueError:
-            start_date=0
+            backup_time=0
         try:
-            start_time:str=start_time
+            last_start_date:str=last_start_date
         except ValueError:
-            start_time=0
+            last_start_date=0
         try:
-            end_date:str=end_date
+            last_start_time:str=last_start_time
         except ValueError:
-            end_date=0
+            last_start_time=0
         try:
-            end_time:str=end_time
+            last_end_date:str=last_end_date
         except ValueError:
-            end_time=0
+            last_end_date=0
+        try:
+            last_end_time:str=last_end_time
+        except ValueError:
+            last_end_time=0
         section[item] = {
 
-'status' : status,
-'backup_date' : backup_date,
-'backup_time' : backup_time,
+'last_status' : last_status,
 'ip_address' : ip_address,
 'group' : group,
 'model' : model,
-'start_date' : start_date,
-'start_time' : start_time,
-'end_date' : end_date,
-'end_time' : end_time,
+'backup_time' : backup_time,
+'last_start_date' : last_start_date,
+'last_start_time' : last_start_time,
+'last_end_date' : last_end_date,
+'last_end_time' : last_end_time,
         }
     return section
 
@@ -86,33 +81,34 @@ def discovery_oxidized_status(section):
 def check_oxidized_status(item, section):
 
     data = section[item]
-    status:str = data['status']
-    backup_date:str = data['backup_date']
-    backup_time:str = data['backup_time']
+    last_status:str = data['last_status']
     ip_address:str = data['ip_address']
     group:str = data['group']
     model :str= data['model']
-    start_date :str= data['start_date']
-    start_time :str= data['start_time']
-    end_date :str= data['end_date']
-    end_time :str= data['end_time']
-    if status == 'never':
+    backup_time :str= data['backup_time']
+    last_start_date :str= data['last_start_date']
+    last_start_time :str= data['last_start_time']
+    last_end_date :str= data['last_end_date']
+    last_end_time :str= data['last_end_time']
+    if last_status == 'never':
         yield Result(state=State.UNKNOWN, 
                     summary=f"No backup for {item}",
                     )
-    if status == 'no_connection':
+    if last_status == 'no_connection':
         yield Result(state=State.CRIT,
-                    summary=f"Last backup at {(start_date)} {(start_time)}, ended {(end_date)} {(end_time)} at was not successful",
-                    details = f"Last Update: {(backup_date)} {(backup_time)} \n \
+                    summary=f"Last backup at {(last_start_date)} {(last_start_time)}, ended {(last_end_time)} at was not successful",
+                    details = f"Runtime backup in seconds: {(backup_time)} \n \
                     Group: {(group)}, Model: {model}, IP Address: {ip_address}",
                     )
     else:
-        if status == 'success':
+        if last_status == 'success':
             yield Result(state=State.OK,
-                    summary=f"Last backup at {(start_date)} {(start_time)}, ended {(end_date)} {(end_time)} was successful",
-                    details = f"Last Update: {(backup_date)} {(backup_time)} \n \
+                    summary=f"Last backup at {(last_start_date)} {(last_start_time)}, ended {(last_end_time)} was successful",
+                    details = f"Runtime backup in seconds: {(backup_time)} \n \
                     Group: {(group)}, Model: {model}, IP Address: {ip_address}",
                     )
+# Metrics
+        yield Metric("oxidized_time", float(backup_time))
 
 register.check_plugin(
     name="oxidized_status",

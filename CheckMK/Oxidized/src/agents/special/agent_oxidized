@@ -17,10 +17,6 @@ port = "8888"
 nodes = "nodes.json"
 oxidized_url = f"{protocol}://{hostname}:{port}/{nodes}"
 
-
-#time_parsed = datetime.strptime(time, "%Y-%m-%d %H:%M:%S %Z")
-#if datetime.now() - time_parsed >= THRESHOLD:
-
 def get_oxidized_status():
     print()
 try:
@@ -29,15 +25,18 @@ try:
     print("<<<oxidized_status>>>")
     for backupstatus in oxidized_status:
         name:str  = backupstatus['name']
+        full_name:str  = backupstatus['full_name']
         ip:str = backupstatus['ip']
         group:str  = backupstatus['group']
         model:str = backupstatus['model']
+        last_start = datetime.strptime(backupstatus['last']['start'], "%Y-%m-%d %H:%M:%S %Z")
+        last_end = datetime.strptime(backupstatus['last']['end'], "%Y-%m-%d %H:%M:%S %Z")
+        last_status:str = backupstatus['last']['status']
+        backup_time:str = backupstatus['last']['time']
         mtime:str = backupstatus['mtime']
         status:str = backupstatus['status']
         time = datetime.strptime(backupstatus['time'], "%Y-%m-%d %H:%M:%S %Z")
-        start = datetime.strptime(backupstatus['last']['start'], "%Y-%m-%d %H:%M:%S %Z")
-        end = datetime.strptime(backupstatus['last']['end'], "%Y-%m-%d %H:%M:%S %Z")
-        print(f"{name} {status} {time} {ip} {group} {model} {start} {end}")
+        print(f"{name} {last_status} {ip} {group} {model} {backup_time} {last_start} {last_end}")
 except OSError:
     print(f"Connection error to host {hostname}")
     sys.exit(1)
