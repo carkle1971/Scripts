@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+#pylint: disable=undefined-variable, missing-docstring
+# 2023 created by Carlo Kleinloog
+#/omd/sites/BIS/local/share/check_mk/checks
+import argparse
+import json
+import sys
+import cmk.utils.password_store
+
+def check_oxidized_arguments(params, hostname, ipaddress):
+    args = ''
+    args += " " + (params["-H"]) #var1
+    return args
+
+special_agent_info['oxidized'] = check_oxidized_arguments

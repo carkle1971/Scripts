@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+# 2023 created by Carlo Kleinloog
+# /omd/sites/BIS/local/share/check_mk/agents/special
+import ipaddress
+import sys
+from datetime import datetime, timedelta
+from collections import Counter
+import json
+import requests
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
+hostname = '10.31.6.5'
+protocol = "http"
+port = "8888"
+nodes = "nodes.json"
+oxidized_url = f"{protocol}://{hostname}:{port}/{nodes}"
+
+def get_oxidized_status():
+    print()
+try:
+    jsonStr_status  = requests.get(oxidized_url).text
+    oxidized_status = (json.loads(jsonStr_status.replace(' ',':')))
+    print("<<<oxidized_status>>>")
+    for backupstatus in oxidized_status:
+        name:str  = backupstatus['name']
+        ip:str = backupstatus['ip']
+        group:str  = backupstatus['group']
+        model:str = backupstatus['model']
+        mtime:str = backupstatus['mtime']
+        status:str = backupstatus['status']
+        time:str = backupstatus['time']
+        print(f"{name} {status} {time} {ip} {group} {model}")
+except OSError:
+    print(f"Connection error to host {hostname}")
+    sys.exit(1)
+
+
+if __name__ == '__main__':
+    get_oxidized_status()
