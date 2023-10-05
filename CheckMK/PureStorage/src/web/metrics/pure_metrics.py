@@ -56,7 +56,57 @@ metric_info["pure_provisioning"] = {
     "color": "23/a",
 }
 
+metric_info["pure_capacity"] = {
+    "title": _("Array capacity"),
+    "unit": "bytes",
+    "color": "44/a",
+}
+metric_info["pure_provisioned"] = {
+    "title": _("Provisioned space"),
+    "unit": "bytes",
+    "color": "23/a",
+}
+metric_info["pure_total"] = {
+    "title": _("Total used space"),
+    "unit": "bytes",
+    "color": "33/a",
+}
 
+metric_info["pure_shared"] = {
+    "title": _("Shared space"),
+    "unit": "bytes",
+    "color": "26/a",
+}
+
+metric_info["pure_volumes"] = {
+    "title": _("Unique space used"),
+    "unit": "bytes",
+    "color": "13/a",
+}
+
+metric_info["pure_datareduction"] = {
+    "title": _("Data reduction for array"),
+    "unit": "count",
+    "color": "52/a",
+}
+
+metric_info["pure_totalreduction"] = {
+    "title": _("Total reduction for array"),
+    "unit": "count",
+    "color": "52/b",
+}
+
+metric_info["pure_snaphots"] = {
+    "title": _("Space in use for snapshots"),
+    "unit": "bytes",
+    "color": "16/a",
+}
+
+metric_info["pure_percentage"] = {
+    "title": _("Percentage Used"),
+    "unit": "bytes",
+    "color": "26/a",
+}
 
 # .
 #   .--Graphs--------------------------------------------------------------.
@@ -82,4 +132,18 @@ graph_info["pure_details"] = {
         "fs_provisioning:crit",
     ],
     "range": (0, "fs_used:max"),
+}
+
+graph_info["pure_array_info"] = {
+    "title": _("Pure array information"),
+    "metrics": [
+        ("pure_capacity", "line"),
+        ("pure_total", "line"),
+        ("pure_volumes", "line"),
+    ],
+    "scalars": [
+        "pure_capacity:warn",
+        "pure_total:crit",
+    ],
+    "range": (0, "pure_capacity:max"),
 }

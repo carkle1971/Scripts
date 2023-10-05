@@ -93,13 +93,14 @@ def check_pure_arrayinfo(item, section):
     fs_total:int=data['total']
     fs_shared = (int(data['volumes']) + int(data['snapshots']))
     fs_sharedtotal =  int(fs_shared) - int((data['total']))
-    fs_free = fs_capacity - fs_total
-    fs_total_percent = int(fs_total / fs_capacity * 100)
+    fs_free = data['capacity'] - data['total']
+    quotient  = data['total'] / data['capacity']
+    fs_total_percent = quotient  * 100
 
-    if item in section.keys():
+    if fs_total_percent < 80 :
         yield Result(
             state=State.OK,
-            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {render.bytes(fs_total_percent)}",
+            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {fs_total_percent}",
             details = f"Array parity: {fs_parity} \n \
             Data Reduction: {fs_data_reduction} to 1 \n \
             Unique space used: {render.bytes(fs_volumes)} \n \
@@ -112,10 +113,34 @@ def check_pure_arrayinfo(item, section):
         yield Metric("pure_shared", int(fs_sharedtotal))
         yield Metric("pure_volumes", int(fs_volumes))
         yield Metric("pure_array_info", int(fs_capacity))
+        yield Metric("pure_datareduction", float(fs_data_reduction))
+        yield Metric("pure_provisioned", int(fs_provisioning))
+        yield Metric("pure_snaphots", int(fs_snapshots))
+        yield Metric("pure_percentage", int(fs_total_percent), boundaries=(0, 100))
+    if fs_total_percent > 85 and fs_total_percent < 95:
+        yield Result(
+            state=State.WARN,
+            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {fs_total_percent}",
+            details = f"Array parity: {fs_parity} \n \
+            Data Reduction: {fs_data_reduction} to 1 \n \
+            Unique space used: {render.bytes(fs_volumes)} \n \
+            Shared space: {render.bytes(fs_sharedtotal)} \n \
+            Snapshots total size: {render.bytes(fs_snapshots)}",
+            )
+# Metrics
+        yield Metric("pure_capacity", int(fs_capacity))
+        yield Metric("pure_total", int(fs_total))
+        yield Metric("pure_shared", int(fs_sharedtotal))
+        yield Metric("pure_volumes", int(fs_volumes))
+        yield Metric("pure_array_info", int(fs_capacity))
+        yield Metric("pure_datareduction", float(fs_data_reduction))
+        yield Metric("pure_provisioned", int(fs_provisioning))
+        yield Metric("pure_snaphots", int(fs_snapshots))
+        yield Metric("pure_percentage", int(fs_total_percent), boundaries=(0, 100))
     else:
         yield Result(
             state=State.CRIT,
-            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {render.bytes(fs_total_percent)}",
+            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {fs_total_percent}",
             details = f"Array parity: {fs_parity} \n \
             Data Reduction: {fs_data_reduction} to 1 \n \
             Unique space used: {render.bytes(fs_volumes)} \n \
@@ -129,6 +154,10 @@ def check_pure_arrayinfo(item, section):
         yield Metric("pure_shared", int(fs_sharedtotal))
         yield Metric("pure_volumes", int(fs_volumes))
         yield Metric("pure_array_info", int(fs_capacity))
+        yield Metric("pure_datareduction", float(fs_data_reduction))
+        yield Metric("pure_provisioned", int(fs_provisioning))
+        yield Metric("pure_snaphots", int(fs_snapshots))
+        yield Metric("pure_percentage", int(fs_total_percent), boundaries=(0, 100))
 
 register.check_plugin(
     name="pure_arrayinfo",
