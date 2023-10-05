@@ -97,7 +97,7 @@ def check_pure_arrayinfo(item, section):
     quotient  = data['total'] / data['capacity']
     fs_total_percent = quotient  * 100
 
-    if fs_total_percent < 80 :
+    if fs_total_percent > 0 and fs_total_percent  < 80 :
         yield Result(
             state=State.OK,
             summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {fs_total_percent}",
@@ -137,7 +137,7 @@ def check_pure_arrayinfo(item, section):
         yield Metric("pure_provisioned", int(fs_provisioning))
         yield Metric("pure_snaphots", int(fs_snapshots))
         yield Metric("pure_percentage", int(fs_total_percent), boundaries=(0, 100))
-    else:
+    if fs_total_percent > 95:
         yield Result(
             state=State.CRIT,
             summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {fs_total_percent}",
