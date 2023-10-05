@@ -92,35 +92,43 @@ def check_pure_arrayinfo(item, section):
     fs_capacity:int=data['capacity']
     fs_total:int=data['total']
     fs_shared = (int(data['volumes']) + int(data['snapshots']))
-    fs_shared =  int(fs_shared) - int((data['total']))
+    fs_sharedtotal =  int(fs_shared) - int((data['total']))
+    fs_free = fs_capacity - fs_total
+    fs_total_percent = int(fs_total / fs_capacity * 100)
 
     if item in section.keys():
         yield Result(
             state=State.OK,
-            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}",
+            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {render.bytes(fs_total_percent)}",
             details = f"Array parity: {fs_parity} \n \
             Data Reduction: {fs_data_reduction} to 1 \n \
             Unique space used: {render.bytes(fs_volumes)} \n \
-            Shared space: {render.bytes(fs_shared)} \n \
+            Shared space: {render.bytes(fs_sharedtotal)} \n \
             Snapshots total size: {render.bytes(fs_snapshots)}",
             )
 # Metrics
-        yield Metric("pure_1_datareduction", float(data['data_reduction']))
-        yield Metric("pure_4_snaphots", int(fs_snapshots))
+        yield Metric("pure_capacity", int(fs_capacity))
+        yield Metric("pure_total", int(fs_total))
+        yield Metric("pure_shared", int(fs_sharedtotal))
+        yield Metric("pure_volumes", int(fs_volumes))
+        yield Metric("pure_array_info", int(fs_capacity))
     else:
         yield Result(
             state=State.CRIT,
-            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}",
+            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {render.bytes(fs_total_percent)}",
             details = f"Array parity: {fs_parity} \n \
             Data Reduction: {fs_data_reduction} to 1 \n \
             Unique space used: {render.bytes(fs_volumes)} \n \
-            Shared space: {render.bytes(fs_shared)} \n \
+            Shared space: {render.bytes(fs_sharedtotal)} \n \
             Snapshots total size: {render.bytes(fs_snapshots)}",
             )
 
 # Metrics
-        yield Metric("pure_1_datareduction", float(data['data_reduction']))
-        yield Metric("pure_4_snaphots", int(fs_snapshots))
+        yield Metric("pure_capacity", int(fs_capacity))
+        yield Metric("pure_total", int(fs_total))
+        yield Metric("pure_shared", int(fs_sharedtotal))
+        yield Metric("pure_volumes", int(fs_volumes))
+        yield Metric("pure_array_info", int(fs_capacity))
 
 register.check_plugin(
     name="pure_arrayinfo",
