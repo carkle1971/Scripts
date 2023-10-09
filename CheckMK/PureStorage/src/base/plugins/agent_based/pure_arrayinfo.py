@@ -12,6 +12,8 @@ from .agent_based_api.v1 import (
     render,
 )
 
+import math
+
 def parse_pure_arrayinfo(string_table):
 
     section = {}
@@ -94,13 +96,12 @@ def check_pure_arrayinfo(item, section):
     fs_shared = (int(data['volumes']) + int(data['snapshots']))
     fs_sharedtotal =  int(fs_shared) - int((data['total']))
     fs_free = data['capacity'] - data['total']
-    quotient  = data['total'] / data['capacity']
-    fs_total_percent = quotient  * 100
+    fs_total_percent = float(fs_total)* 100 / fs_capacity
 
     if fs_total_percent > 0 and fs_total_percent  < 80 :
         yield Result(
             state=State.OK,
-            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {fs_total_percent}",
+            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {math.trunc(fs_total_percent)} %",
             details = f"Array parity: {fs_parity} \n \
             Data Reduction: {fs_data_reduction} to 1 \n \
             Unique space used: {render.bytes(fs_volumes)} \n \
@@ -116,11 +117,11 @@ def check_pure_arrayinfo(item, section):
         yield Metric("pure_datareduction", float(fs_data_reduction))
         yield Metric("pure_provisioned", int(fs_provisioning))
         yield Metric("pure_snaphots", int(fs_snapshots))
-        yield Metric("pure_percentage", int(fs_total_percent), boundaries=(0, 100))
+        yield Metric("pure_percentage", int(fs_total_percent))
     if fs_total_percent > 85 and fs_total_percent < 95:
         yield Result(
             state=State.WARN,
-            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {fs_total_percent}",
+            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {math.trunc(fs_total_percent)} %",
             details = f"Array parity: {fs_parity} \n \
             Data Reduction: {fs_data_reduction} to 1 \n \
             Unique space used: {render.bytes(fs_volumes)} \n \
@@ -136,11 +137,11 @@ def check_pure_arrayinfo(item, section):
         yield Metric("pure_datareduction", float(fs_data_reduction))
         yield Metric("pure_provisioned", int(fs_provisioning))
         yield Metric("pure_snaphots", int(fs_snapshots))
-        yield Metric("pure_percentage", int(fs_total_percent), boundaries=(0, 100))
+        yield Metric("pure_percentage", int(fs_total_percent))
     if fs_total_percent > 95:
         yield Result(
             state=State.CRIT,
-            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {fs_total_percent}",
+            summary=f"Array capacity: {render.bytes(fs_capacity)}, Provisioned space: {render.bytes(fs_provisioning)}, Total used space: {render.bytes(fs_total)}, Free space: {render.bytes(fs_free)}, Used space in percentage: {math.trunc(fs_total_percent)} %",
             details = f"Array parity: {fs_parity} \n \
             Data Reduction: {fs_data_reduction} to 1 \n \
             Unique space used: {render.bytes(fs_volumes)} \n \
@@ -157,7 +158,7 @@ def check_pure_arrayinfo(item, section):
         yield Metric("pure_datareduction", float(fs_data_reduction))
         yield Metric("pure_provisioned", int(fs_provisioning))
         yield Metric("pure_snaphots", int(fs_snapshots))
-        yield Metric("pure_percentage", int(fs_total_percent), boundaries=(0, 100))
+        yield Metric("pure_percentage", int(fs_total_percent))
 
 register.check_plugin(
     name="pure_arrayinfo",
