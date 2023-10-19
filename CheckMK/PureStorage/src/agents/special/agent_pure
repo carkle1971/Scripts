@@ -7,6 +7,7 @@
 """
 Pure Checks
 """
+from ast import IsNot
 import sys
 import urllib3
 import purestorage
@@ -208,6 +209,30 @@ def get_arrayinfo():
     except (OSError,purestorage.PureHTTPError) as excp:
         print(f"Could not get array volume details - {excp}")
 
+def get_network_interfaces():
+    print("<<<pure_network_interfaces>>>")
+    try:
+        for network_interfaces in FA.list_network_interfaces():
+            if network_interfaces['enabled'] is True:
+                print(f"{network_interfaces['name']} {network_interfaces['address']} {network_interfaces['netmask']} {network_interfaces['gateway']} {network_interfaces['enabled']} {network_interfaces['mtu']} {network_interfaces['speed']} {network_interfaces['hwaddr']}")
+    except OSError:
+        print(f"Could not get network interfaces")
+        sys.exit(1)
+
+def get_hgroups():
+    print("<<<pure_hgroups>>>")
+    try:
+        for hgroups in FA.list_hgroups():
+            if hgroups['hosts']:
+                name = hgroups['name']
+                hosts = hgroups['hosts']
+                delimiter = '_+_'
+                host = delimiter.join(hosts)
+                print(name, host)
+    except OSError:
+        print(f"Could not get host groups")
+        sys.exit(1)
+
 if __name__ == '__main__':
     get_alerts()
     # We need to get Hardware before the drivers, in order
@@ -220,3 +245,5 @@ if __name__ == '__main__':
     get_arraydetails()
     get_arraycertificates()
     get_arrayinfo()
+    get_network_interfaces()
+    get_hgroups()
