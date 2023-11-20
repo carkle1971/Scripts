@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+# 2023 created by Carlo Kleinloog
+# /omd/sites/BIS/local/share/check_mk/agents/special
+# Working CURL: curl -X 'GET' --insecure 'https://10.31.254.253:4443/api/v1/status/openvpn' -H 'accept: application/json' -H 'Authorization: Basic YXBpOm9JSlc0dldyeDdpTjVCdllJMzd2'
+
+import sys
+import os
+from datetime import datetime, timedelta
+from collections import Counter
+import json
+import XenAPI
+import time
+from XenAPI import Session
+import traceback
+
+# Replace these values with your XenServer details
+url = sys.argv[1]
+username = sys.argv[2]
+password = sys.argv[3]
+
+try:
+    session = XenAPI.Session('https://' + url, ignore_ssl=True)
+    session.xenapi.login_with_password(username, password)
+except OSError:
+    print(f"Connection error to host {url}")
+    sys.exit(1)
+except ValueError as error_txt:
+    print(f"unknown internal error: {error_txt}")
+    sys.exit(1)
+
+def get_citrix_host():
+    print()
+try:
+    pool = session.xenapi.pool.get_all()[0]
+    pool_uuid = session.xenapi.pool.get_uuid(pool)
+    hosts = session.xenapi.host.get_all()
+    print("<<<citrix_host>>>")
+    for host in hosts:
+        host_record = session.xenapi.host.get_record(host)
+        data = {
+            'short_message': os.path.basename(__file__).split('.')[0],
+            '_pool_uuid': pool_uuid,
+            '_host_uuid': host_record["uuid"],
+            '_address': host_record["address"],
+            '_software_edition': host_record["edition"],
+            '_enabled': str(host_record["enabled"]),
+            '_hostname': host_record["hostname"],
+            '_memory_overhead': host_record["memory_overhead"],
+            '_name_description': host_record["name_description"],
+            '_name_label': host_record["name_label"],
+            '_software_brand': host_record["software_version"]["product_brand"],
+            '_software_version': host_record["software_version"]["product_version_text"],
+        }
+
+        if(host_record["metrics"] != "OpaqueRef:NULL"):
+            metrics_uuid = session.xenapi.host_metrics.get_uuid(host_record["metrics"])
+            memory_total = session.xenapi.host_metrics.get_memory_total(host_record["metrics"])
+
+        if(host_record["PIFs"] != "OpaqueRef:NULL"):
+            for pif in host_record["PIFs"]:
+                pif_record = session.xenapi.PIF.get_record(pif)
+                device = 'dvc%s' % (pif_record["device"].lstrip("eth"))
+                data['_'+device+'_ip'] = pif_record["IP"]
+                data['_'+device+'_ip_gateway]'] = pif_record["gateway"]
+                data['_'+device+'_ip_netmask'] = pif_record["netmask"]
+                data['_'+device+'_ip_mode'] = pif_record["ip_configuration_mode"]
+                data['_'+device+'_mac'] = pif_record["MAC"]
+
+            print(f"{data['_hostname']} {data['_software_brand'].replace(' ','_')} {data['_software_version'].replace(' ','_')} {data['_address']} {data['_memory_overhead']} {memory_total} ")
+except Exception:
+    sys.stderr.write('ERROR: %s\n' % traceback.format_exc())
+
+session.xenapi.session.logout()
+
+if __name__ == '__main__':
+    get_citrix_host()

@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+#pylint: disable=undefined-variable, missing-docstring
+# 2023 created by Carlo Kleinloog
+#/omd/sites/BIS/local/share/check_mk/checks
+import argparse
+import json
+import sys
+import cmk.utils.password_store
+
+def check_citrix_arguments(params, hostname, ipaddress):
+    args = ''
+    args += " " + (params["-H"]) #var1
+    args += " " + (params["-u"]) #var2
+    args += " " + (params["-p"]) #var3
+    #args += " " + quote_shell_string(hostname)
+    #args += " " + quote_shell_string(ipaddress)
+    return args
+special_agent_info['citrix'] = check_citrix_arguments
